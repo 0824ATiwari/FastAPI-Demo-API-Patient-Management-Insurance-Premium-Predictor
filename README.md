@@ -1,148 +1,55 @@
-\FastAPI Demo API — Patient Management & Insurance Premium Predictor
-A two-part FastAPI project demonstrating REST API design with Pydantic validation and ML model serving. Built as a learning project covering CRUD operations, data modeling, and deploying a trained machine learning model behind an API endpoint.
-
-
+FastAPI Demo API — Patient Management & Insurance Premium Predictor
+A two-part FastAPI learning project covering CRUD API design, Pydantic v2 validation, and ML model serving.
 What's Inside
-1. Patient Management API (main.py)
-A full CRUD REST API for managing patient health records stored in a JSON file. Supports creating, reading, updating, and deleting patients. BMI and weight verdict (Underweight / Normal / Obese) are computed automatically using Pydantic computed_field.
-2. Insurance Premium Predictor API (app.py)
-A FastAPI service that wraps a pre-trained scikit-learn classification model (model.pkl) to predict an insurance premium category (Low / Medium / High) based on user inputs. Features like BMI, lifestyle risk, age group, and city tier are derived automatically from raw inputs before inference.
-3. Streamlit Frontend (frontend.py)
-A simple web UI built with Streamlit that collects user inputs and calls the Insurance Predictor API to display the predicted premium category.
 
+main.py — CRUD REST API for patient records stored in a JSON file. BMI and weight verdict auto-computed via Pydantic computed_field
+app.py — Wraps a pre-trained sklearn model to predict insurance premium category (Low / Medium / High)
+frontend.py — Streamlit UI that calls the prediction API. Replace the hardcoded AWS IP before pushing
+model.pkl — Pre-trained classification model
+patients.json — Flat-file patient database
+insurance.csv — Training dataset
+fastapi_ml_model.ipynb — Model training notebook
 
-Project Structure
-fastapi-demo-api-main/
+Patient Management Endpoints
 
-├── main.py              # Patient Management CRUD API
+GET / — Health check
+GET /view — List all patients
+GET /patient/{patient_id} — Get one patient
+GET /sort?sort_by=bmi&order=asc — Sort by height, weight, or bmi
+POST /create — Add patient
+PUT /edit/{patient_id} — Update patient
+DELETE /delete/{patient_id} — Remove patient
 
-├── app.py               # Insurance Premium Prediction API (ML model serving)
+Full interactive docs at http://localhost:8000/docs
+Insurance Predictor Endpoint
 
-├── frontend.py          # Streamlit frontend for the prediction API
+POST /predict — Accepts age, weight, height, income_lpa, smoker, city, occupation
+Returns { "predicted_category": "Low" / "Medium" / "High" }
 
-├── model.pkl            # Pre-trained classification model
+Dataset Columns
 
-├── patients.json        # JSON flat-file database for patient records
-
-├── insurance.csv        # Training dataset (age, weight, BMI, occupation, etc.)
-
-└── fastapi_ml_model.ipynb  # Notebook: model training and exploration
-
-
-API Endpoints
-Patient Management (main.py)
-Method
-Endpoint
-Description
-GET
-/
-Health check
-GET
-/about
-API description
-GET
-/view
-List all patients
-GET
-/patient/{patient_id}
-Get patient by ID
-GET
-/sort?sort_by=bmi&order=asc
-Sort patients by height, weight, or BMI
-POST
-/create
-Add a new patient
-PUT
-/edit/{patient_id}
-Update patient fields
-DELETE
-/delete/{patient_id}
-Remove a patient
-
-Insurance Predictor (app.py)
-Method
-Endpoint
-Description
-POST
-/predict
-Predict insurance premium category
-
-
-Sample request body for /predict:
-
-{
-
-  "age": 32,
-
-  "weight": 75.0,
-
-  "height": 1.72,
-
-  "income_lpa": 12.5,
-
-  "smoker": false,
-
-  "city": "Chandigarh",
-
-  "occupation": "private_job"
-
-}
-
-Response:
-
-{
-
-  "predicted_category": "Low"
-
-}
-
+age — User age
+weight — kg
+height — meters
+income_lpa — Annual income in Lakhs Per Annum
+smoker — Boolean
+city — Indian city
+occupation — retired / freelancer / student / government_job / business_owner / unemployed / private_job
+insurance_premium_category — Target label: Low / Medium / High
 
 Features
-Pydantic v2 validation with Field constraints and computed_field for derived attributes
-Auto-computed fields: BMI, weight verdict, age group, lifestyle risk, city tier
-Input validation: age range, height/weight bounds, gender and occupation literals
-Sorted queries with field and order selection via query parameters
-Flat-file persistence using patients.json for the CRUD API
-ML model serving with a pre-trained pickle model and pandas DataFrame inference
-City tier classification across Tier 1, Tier 2, and Tier 3 Indian cities
 
-
-
-Dataset
-insurance.csv contains synthetic records with the following columns:
-
-Column
-Description
-age
-User age
-weight
-Weight in kg
-height
-Height in meters
-income_lpa
-Annual income in LPA (Lakhs Per Annum)
-smoker
-Boolean smoking status
-city
-Indian city name
-occupation
-One of: retired, freelancer, student, government_job, business_owner, unemployed, private_job
-insurance_premium_category
-Target label: Low / Medium / High
-
-
+Pydantic v2 validation with Field constraints
+Auto-computed: BMI, weight verdict, age group, lifestyle risk, city tier
+City tier classification for Tier 1, 2, 3 Indian cities
+Sorted queries via query parameters
+Swagger UI auto-generated
 
 Tech Stack
-FastAPI — API framework
-Pydantic v2 — Data validation and schema modeling
-scikit-learn — ML model (pre-trained, loaded via pickle)
-pandas — DataFrame construction for model inference
-Streamlit — Frontend UI
-Uvicorn — ASGI server
 
-
-Notes
-The patient database (patients.json) is a flat file — not suitable for concurrent writes in production.
-The hardcoded IP in frontend.py (http://34.226.152.222:8000/predict) should be updated to your deployment URL or localhost for local development.
-The verdict field in the Patient model classifies BMI 25–30 as "Normal" rather than "Overweight" — this appears to be an intentional simplification.
-
+FastAPI
+Pydantic v2
+scikit-learn
+pandas
+Streamlit
+Uvicorn
